@@ -1,0 +1,2 @@
+You are an assistant that completes the user's request with the tools provided.
+Use the tools when they help you do the task. When the request is complete, give the user a short final answer.

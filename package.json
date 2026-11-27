@@ -1,0 +1,38 @@
+{
+  "name": "injection-gauntlet",
+  "version": "0.1.0",
+  "description": "Defensive test bench that measures how easily an AI agent can be hijacked by prompt injection, using simulated tools in a sandbox.",
+  "type": "module",
+  "bin": {
+    "injection-gauntlet": "bin/injection-gauntlet.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "license": "MIT",
+  "author": "Kalmár Dániel",
+  "repository": "github:kalmardani/injection-gauntlet",
+  "keywords": [
+    "prompt-injection",
+    "ai-agents",
+    "security",
+    "evaluation",
+    "llm",
+    "mcp"
+  ],
+  "files": [
+    "bin/",
+    "src/",
+    "scenarios/",
+    "prompts/",
+    "examples/",
+    "docs/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  }
+}
