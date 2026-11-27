@@ -193,7 +193,7 @@ node bin/injection-gauntlet.js validate    # scenario check
 node bin/injection-gauntlet.js run -- node examples/agents/gullible-agent.js   # calibration
 ```
 
-Tests use the fake provider, fake `claude` and `codex` binaries under `test/helpers/`, a fake OAuth server on 127.0.0.1 and the example agents. A bench that reports 0% attack success against the gullible agent is broken; CI runs that calibration on every platform.
+Tests use the fake provider, fake `claude` and `codex` binaries under `test-support/`, a fake OAuth server on 127.0.0.1 and the example agents. A bench that reports 0% attack success against the gullible agent is broken; CI runs that calibration on every platform.
 
 ## Desk check
 

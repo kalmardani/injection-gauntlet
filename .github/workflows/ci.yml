@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node --version
-      - run: npm test
+      - run: node --test
       - name: Validate the built in scenarios
         run: node bin/injection-gauntlet.js validate
       - name: Calibration run against the gullible example agent

@@ -9,7 +9,7 @@ import { OAuthClient, loadOAuthConfig, pkcePair, base64url, AuthError } from '..
 import { TokenStore, userConfigDir } from '../src/auth/store.js';
 import { authHeadersFor } from '../src/providers/index.js';
 import { cliSignedIn, cliInstalled, loginSubscription } from '../src/auth/subscription.js';
-import { startTokenServer } from './helpers/token-server.js';
+import { startTokenServer } from '../test-support/token-server.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tmp = () => mkdtempSync(path.join(os.tmpdir(), 'ig-auth-'));
@@ -171,9 +171,9 @@ test('subscription login drives the official CLIs and never touches their creden
   const state = tmp();
   const saved = { ...process.env };
   process.env.IG_CLAUDE_BIN = process.execPath;
-  process.env.IG_CLAUDE_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test', 'helpers', 'fake-claude.js')]);
+  process.env.IG_CLAUDE_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test-support', 'fake-claude.js')]);
   process.env.IG_CODEX_BIN = process.execPath;
-  process.env.IG_CODEX_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test', 'helpers', 'fake-codex.js')]);
+  process.env.IG_CODEX_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test-support', 'fake-codex.js')]);
   process.env.FAKE_CLI_STATE = state;
   try {
     assert.deepEqual((await cliInstalled('claude')).installed, true);

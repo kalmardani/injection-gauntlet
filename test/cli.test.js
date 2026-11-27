@@ -68,7 +68,7 @@ test('run against the gullible agent writes reports and honours --max-asr', asyn
 });
 
 test('--max-asr fails closed when trials errored', async () => {
-  const r = await cli(['run', '--only', 'direct-*', '--max-asr', '0.5', '--quiet', '--', 'node', path.join(ROOT, 'test', 'helpers', 'bad-agent.js'), 'garbage']);
+  const r = await cli(['run', '--only', 'direct-*', '--max-asr', '0.5', '--quiet', '--', 'node', path.join(ROOT, 'test-support', 'bad-agent.js'), 'garbage']);
   assert.equal(r.code, 3);
   assert.match(r.stdout, /NOT CHECKED/);
 });

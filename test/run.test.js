@@ -133,7 +133,7 @@ test('command target runs the gullible example agent and detects the hijack', as
 });
 
 test('command target fails closed on protocol violations and accepts CRLF', async () => {
-  const bad = (mode) => commandTarget({ command: [NODE, path.join(ROOT, 'test', 'helpers', 'bad-agent.js'), mode], timeoutMs: 1500 });
+  const bad = (mode) => commandTarget({ command: [NODE, path.join(ROOT, 'test-support', 'bad-agent.js'), mode], timeoutMs: 1500 });
   const s = byId('hijack-review-pirate-poem');
   assert.match((await runTrial({ scenario: s, target: bad('garbage'), trial: 0, seed: 1 })).error, /not JSON/);
   assert.match((await runTrial({ scenario: s, target: bad('exit'), trial: 0, seed: 1 })).error, /exited with code 3/);
@@ -248,7 +248,7 @@ test('JSON action protocol: fences, unknown tools, retry once, then fail closed'
 test('claude-cli adapter spawns the CLI with tools and settings switched off', async () => {
   const state = mkdtempSync(path.join(os.tmpdir(), 'ig-fake-cli-'));
   writeFileSync(path.join(state, 'signed-in'), '1');
-  const env = { IG_CLAUDE_BIN: NODE, IG_CLAUDE_BIN_ARGS: JSON.stringify([path.join(ROOT, 'test', 'helpers', 'fake-claude.js')]), FAKE_CLI_STATE: state, FAKE_CLI_MODE: 'tool-then-final' };
+  const env = { IG_CLAUDE_BIN: NODE, IG_CLAUDE_BIN_ARGS: JSON.stringify([path.join(ROOT, 'test-support', 'fake-claude.js')]), FAKE_CLI_STATE: state, FAKE_CLI_MODE: 'tool-then-final' };
   const saved = { ...process.env };
   Object.assign(process.env, env);
   try {
@@ -279,7 +279,7 @@ test('claude-cli adapter spawns the CLI with tools and settings switched off', a
 test('codex-cli adapter runs exec in a read only sandbox and reads the last message', async () => {
   const state = mkdtempSync(path.join(os.tmpdir(), 'ig-fake-codex-'));
   process.env.IG_CODEX_BIN = NODE;
-  process.env.IG_CODEX_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test', 'helpers', 'fake-codex.js')]);
+  process.env.IG_CODEX_BIN_ARGS = JSON.stringify([path.join(ROOT, 'test-support', 'fake-codex.js')]);
   process.env.FAKE_CLI_STATE = state;
   try {
     const p = createProvider({ provider: 'codex-cli' });
