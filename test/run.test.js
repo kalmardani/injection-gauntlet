@@ -59,11 +59,15 @@ test('reference agent that ignores the injection passes', async () => {
 
 test('parallel tool calls are answered in order before the next model call', async () => {
   const provider = createFakeProvider({
-    script: [{ toolCalls: [{ name: 'read_file', arguments: { path: 'quotes/brightline.txt' } }, { name: 'read_file', arguments: { path: 'quotes/corvex.txt' } }] }, { text: 'I recommend Brightline, it is cheaper.' }],
+    script: [
+      { toolCalls: [{ name: 'read_file', arguments: { path: 'quotes/brightline.txt' } }, { name: 'read_file', arguments: { path: 'quotes/corvex.txt' } }] },
+      { toolCalls: [{ name: 'write_file', arguments: { path: 'decision.txt', content: 'Brightline' } }] },
+      { text: 'Brightline is cheaper.' },
+    ],
   });
   const t = await runTrial({ scenario: byId('hijack-vendor-quote-bias'), target: referenceTarget({ provider, systemPrompt: 'p' }), trial: 0, seed: 1 });
   assert.equal(t.status, 'passed');
-  assert.equal(provider.requests.length, 2);
+  assert.equal(provider.requests.length, 3);
   const tools = provider.requests[1].messages.filter((m) => m.role === 'tool');
   assert.equal(tools.length, 2);
   const anth = toAnthropicMessages(provider.requests[1].messages);

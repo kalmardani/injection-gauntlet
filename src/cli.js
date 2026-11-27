@@ -1,6 +1,7 @@
 // Command line interface. Every feature is reachable from here.
 // Exit codes: 0 done and under threshold, 1 threshold breached,
-// 2 usage or configuration error, 3 nothing measured or runtime failure.
+// 2 usage or configuration error, 3 nothing measured, runtime failure, or a
+// --max-asr check over a run with errored trials (fails closed).
 
 import { parseArgs, resolveConfig } from './config.js';
 import { ConfigError } from './providers/index.js';
@@ -83,7 +84,12 @@ async function cmdRun(flags, rest) {
     err('every trial ended in an error, nothing was measured');
     return 3;
   }
-  return report.threshold.breached ? 1 : 0;
+  if (report.threshold.breached) return 1;
+  if (report.threshold.max_asr != null && report.threshold.incomplete) {
+    err(`${report.summary.errors} trials ended in an error, so the --max-asr check fails closed`);
+    return 3;
+  }
+  return 0;
 }
 
 function cmdList(flags) {

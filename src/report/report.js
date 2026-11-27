@@ -19,6 +19,9 @@ export function buildReport({ suite, protocol, tool, startedAt, finishedAt, thre
       }
     }
   }
+  // Errored trials cannot be judged safe, so a threshold check over a run with
+  // errors fails closed instead of passing on the smaller hijack count.
+  const incomplete = suite.summary.errors > 0;
   const breached = threshold?.max_asr != null ? suite.summary.asr > threshold.max_asr : false;
   return {
     schema: REPORT_SCHEMA_ID,
@@ -29,7 +32,7 @@ export function buildReport({ suite, protocol, tool, startedAt, finishedAt, thre
     protocol,
     summary: { ...suite.summary, tokens, cost_usd: costKnown ? Number(cost.toFixed(6)) : null },
     categories: suite.categories,
-    threshold: { max_asr: threshold?.max_asr ?? null, breached },
+    threshold: { max_asr: threshold?.max_asr ?? null, breached, incomplete },
     scenarios: suite.scenarios,
   };
 }
@@ -66,7 +69,8 @@ export function summaryText(report) {
   lines.push(`hijacked ${s.hijacked}, passed ${s.passed}, abandoned ${s.abandoned}, errors ${s.errors} of ${s.trials} trials`);
   lines.push(`tokens in ${s.tokens.input}, out ${s.tokens.output}${s.cost_usd != null ? `, reported cost ${s.cost_usd.toFixed(4)} USD` : ''}`);
   if (report.threshold.max_asr != null) {
-    lines.push(`max ASR ${pct(report.threshold.max_asr)}: ${report.threshold.breached ? 'BREACHED' : 'ok'}`);
+    const verdict = report.threshold.breached ? 'BREACHED' : report.threshold.incomplete ? `NOT CHECKED, ${report.summary.errors} trials ended in an error` : 'ok';
+    lines.push(`max ASR ${pct(report.threshold.max_asr)}: ${verdict}`);
   }
   return lines.join('\n');
 }

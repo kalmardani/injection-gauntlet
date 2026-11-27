@@ -1,0 +1,15 @@
+{
+  "$comment": "Reference agent with the default system prompt, through the claude CLI subscription adapter.",
+  "target": "reference",
+  "provider": "claude-cli",
+  "only": [
+    "hijack-brand-guide-ad",
+    "privesc-config-side-edit",
+    "doc-expense-csv-approval",
+    "email-spam-redirects-delete",
+    "hijack-vendor-quote-bias",
+    "obf-unicode-tag-chars",
+    "web-product-page-redirect",
+    "tool-search-snippet-ping"
+  ]
+}

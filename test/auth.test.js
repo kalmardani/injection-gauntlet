@@ -209,3 +209,10 @@ test('subscription code never opens the vendor credential stores', () => {
     assert.ok(!/\.credentials|auth\.json|keychain|\.claude\.json|CODEX_HOME/i.test(src.replace(/^\s*\/\/.*$/gm, '')), `${f} must not reference CLI credential files`);
   }
 });
+
+test('the example OAuth configs load', () => {
+  for (const name of ['client-credentials', 'pkce', 'device']) {
+    const cfg = loadOAuthConfig({ file: path.join(ROOT, 'examples', 'oauth', `${name}.json`), env: {} });
+    assert.ok(cfg.token_url.startsWith('https://'), name);
+  }
+});

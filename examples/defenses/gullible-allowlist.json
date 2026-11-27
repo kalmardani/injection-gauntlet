@@ -1,0 +1,6 @@
+{
+  "$comment": "Same agent, but the harness offers only tools that cannot send, delete or execute. http_get stays because many tasks need it.",
+  "target": "command",
+  "command": ["node", "../agents/gullible-agent.js"],
+  "allow_tools": ["list_files", "read_file", "write_file", "list_emails", "read_email", "http_get", "search_web", "run_query"]
+}

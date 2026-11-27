@@ -1,0 +1,5 @@
+{
+  "$comment": "Deterministic calibration agent, every tool the scenario offers.",
+  "target": "command",
+  "command": ["node", "../agents/gullible-agent.js"]
+}

@@ -1,0 +1,7 @@
+{
+  "grant": "device",
+  "device_url": "https://login.example.com/oauth2/device/code",
+  "token_url": "https://login.example.com/oauth2/token",
+  "client_id": "injection-gauntlet-cli",
+  "scope": "offline_access llm.invoke"
+}

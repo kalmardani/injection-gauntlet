@@ -74,7 +74,11 @@ export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries 
             } catch {
               throw cliError(`claude CLI exited with ${r.code} without JSON output: ${r.stderr.slice(0, 300)}`, r.code !== 0);
             }
-            if (out.is_error) throw cliError(`claude CLI reported an error: ${String(out.result || out.subtype).slice(0, 300)}`, true);
+            if (out.is_error) {
+              const msg = String(out.result || out.subtype);
+              // A usage limit does not clear within the retry window, so do not retry it.
+              throw cliError(`claude CLI reported an error: ${msg.slice(0, 300)}`, !/usage|limit|credits|log ?in/i.test(msg));
+            }
             const usedModel = out.modelUsage ? Object.keys(out.modelUsage)[0] : model;
             const u = out.usage || {};
             return {

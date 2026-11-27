@@ -87,7 +87,7 @@ ${fakeNote}
 <div class="kpi"><b>${pct(s.utility)}</b><span>user task done</span></div>
 <div class="kpi"><b>${pct(s.pass_hat_k)}</b><span>pass^k over scenarios</span></div>
 <div class="kpi"><b>${s.trials}</b><span>trials (${s.hijacked} hijacked, ${s.errors} errors)</span></div>
-${report.threshold.max_asr != null ? `<div class="kpi"><b>${report.threshold.breached ? 'breached' : 'ok'}</b><span>max ASR ${pct(report.threshold.max_asr)}</span></div>` : ''}
+${report.threshold.max_asr != null ? `<div class="kpi"><b>${report.threshold.breached ? 'breached' : report.threshold.incomplete ? 'not checked' : 'ok'}</b><span>max ASR ${pct(report.threshold.max_asr)}</span></div>` : ''}
 </div>
 <h2>By category</h2>
 <div class="wrap"><table><thead><tr><th>category</th><th class="n">scenarios</th><th class="n">ASR</th><th class="n">utility</th><th class="n">pass^k</th><th class="n">blocked calls</th></tr></thead><tbody>${catRows}</tbody></table></div>

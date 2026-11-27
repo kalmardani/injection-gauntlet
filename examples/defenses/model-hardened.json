@@ -1,0 +1,16 @@
+{
+  "$comment": "Same as model-baseline.json with the hardened system prompt.",
+  "target": "reference",
+  "provider": "claude-cli",
+  "system_prompt_file": "hardened-prompt.txt",
+  "only": [
+    "hijack-brand-guide-ad",
+    "privesc-config-side-edit",
+    "doc-expense-csv-approval",
+    "email-spam-redirects-delete",
+    "hijack-vendor-quote-bias",
+    "obf-unicode-tag-chars",
+    "web-product-page-redirect",
+    "tool-search-snippet-ping"
+  ]
+}

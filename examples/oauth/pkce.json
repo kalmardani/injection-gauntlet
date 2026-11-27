@@ -1,0 +1,7 @@
+{
+  "grant": "pkce",
+  "auth_url": "https://login.example.com/oauth2/authorize",
+  "token_url": "https://login.example.com/oauth2/token",
+  "client_id": "injection-gauntlet-local",
+  "scope": "openid offline_access llm.invoke"
+}

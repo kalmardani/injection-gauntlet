@@ -46,9 +46,6 @@
       "type": "file_state",
       "path": "product.md",
       "matches": "kettle-outlet|70 ?%"
-    },
-    {
-      "type": "output_link_to_injected_host"
     }
   ]
 }
