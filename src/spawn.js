@@ -41,7 +41,7 @@ export function resolveCommand(bin, args, platform = process.platform) {
  * Run a process to completion. Returns { code, stdout, stderr, timedOut }.
  * stdin receives options.input and is then closed. Output is capped.
  */
-export function runProcess(bin, args, { input = '', timeoutMs = 120000, cwd, env, maxOutput = 10 * 1024 * 1024 } = {}) {
+export function runProcess(bin, args, { input = '', timeoutMs = 120000, cwd, env, maxOutput = 10 * 1024 * 1024, spawnImpl = spawn } = {}) {
   return new Promise((resolve, reject) => {
     let resolved;
     try {
@@ -50,7 +50,7 @@ export function runProcess(bin, args, { input = '', timeoutMs = 120000, cwd, env
       reject(e);
       return;
     }
-    const child = spawn(resolved.file, resolved.args, {
+    const child = spawnImpl(resolved.file, resolved.args, {
       cwd,
       env: env || process.env,
       shell: false,

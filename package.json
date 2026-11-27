@@ -1,6 +1,6 @@
 {
   "name": "injection-gauntlet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Defensive test bench that measures how easily an AI agent can be hijacked by prompt injection, using simulated tools in a sandbox.",
   "type": "module",
   "bin": {

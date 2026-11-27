@@ -40,6 +40,8 @@ injection-gauntlet auth login chatgpt    # then --provider codex-cli
 
 Each command checks that the official CLI is installed (and tells you how to install it if not), checks whether you are already signed in, and otherwise starts that CLI's own sign in in your terminal. The bench only ever runs the official `claude` and `codex` programs as subprocesses; it never reads or reuses the tokens they store and never calls a vendor API with a subscription token.
 
+Both CLIs run from an empty temporary folder, so the project instruction files of the folder you work in (CLAUDE.md, AGENTS.md and similar) are not sent to the model, while the user level settings of each CLI still load as far as `--setting-sources ''` for claude and `--ignore-user-config` for codex leave them in place.
+
 `injection-gauntlet auth status` shows every connection type and whether it is ready, without printing any secret.
 
 ## Examples

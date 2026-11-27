@@ -18,10 +18,12 @@ injection-gauntlet feeds hostile text to an agent and records what the agent tri
 | Terminal | ANSI escape sequences in agent output | stripped before printing |
 | API keys and OAuth tokens | leaking into logs or reports | only in request headers; never printed; token cache file mode 0600 where supported |
 | OAuth endpoints | downgrade, code interception | https required except loopback, PKCE S256, state check, loopback redirect on 127.0.0.1 |
-| Vendor CLIs (claude, codex) | the target model reaching the real machine | claude runs with no built in tools, no MCP servers and no settings; codex runs read only in an empty folder with the user config ignored |
+| Vendor CLIs (claude, codex) | the target model reaching the real machine | both run in a fresh empty temp folder; claude runs with no built in tools, no MCP servers and no settings; codex runs read only with the user config ignored |
 | MCP server | a model choosing what to run | the target is fixed at start; tool arguments cannot carry commands, URLs or paths |
 
 The bench never reads or reuses the credentials stored by the claude or codex CLIs.
+
+Both CLIs run from an empty temporary folder, so the project instruction files of the folder you work in (CLAUDE.md, AGENTS.md and similar) are not sent to the model, while the user level settings of each CLI still load as far as `--setting-sources ''` for claude and `--ignore-user-config` for codex leave them in place.
 
 ## Known limits
 

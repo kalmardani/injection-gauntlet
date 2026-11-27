@@ -5,8 +5,11 @@
 // claude-cli: claude -p --output-format json, with every built in tool and
 //   every MCP server switched off and no user settings loaded, so an injected
 //   instruction cannot reach the real machine through the target.
-// codex-cli:  codex exec in a read only sandbox, in an empty temp directory,
-//   with the user's config ignored.
+// codex-cli:  codex exec in a read only sandbox, with the user's config ignored.
+//
+// Both run in a fresh, empty temp directory per call, never the user's current
+// directory. The CLIs load instruction files (CLAUDE.md, AGENTS.md and
+// similar) from their working directory and send them with every call.
 
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
@@ -16,6 +19,21 @@ import { cliCommand } from '../auth/subscription.js';
 import { chatViaActions, PROTOCOL_INSTRUCTIONS } from './action-protocol.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+export function makeWorkDir() {
+  return mkdtempSync(path.join(os.tmpdir(), 'injection-gauntlet-llm-'));
+}
+
+// Called from a finally block, so it also runs after an error or a timeout. The
+// retries cover Windows, where a killed process can hold the folder for a moment.
+// A leftover temp folder must not hide the real result, so errors are swallowed.
+export function removeWorkDir(dir) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+  } catch {
+    // best effort
+  }
+}
 
 async function withRetries(fn, maxRetries) {
   let last;
@@ -55,7 +73,7 @@ export function claudeArgs({ system, model }) {
   return args;
 }
 
-export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries = 2 } = {}) {
+export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries = 2, spawn } = {}) {
   const { bin, prefix } = cliCommand('claude');
   return {
     name: 'claude-cli',
@@ -64,9 +82,9 @@ export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries 
       const fullSystem = `${system || ''}\n\n${PROTOCOL_INSTRUCTIONS}`.trim();
       const complete = (prompt) =>
         withRetries(async () => {
-          const cwd = mkdtempSync(path.join(os.tmpdir(), 'ig-claude-'));
+          const cwd = makeWorkDir();
           try {
-            const r = await runProcess(bin, [...prefix, ...claudeArgs({ system: fullSystem, model })], { input: prompt, timeoutMs, cwd });
+            const r = await runProcess(bin, [...prefix, ...claudeArgs({ system: fullSystem, model })], { input: prompt, timeoutMs, cwd, spawnImpl: spawn });
             if (r.timedOut) throw cliError(`claude CLI timed out after ${timeoutMs} ms`, true);
             let out;
             try {
@@ -91,7 +109,7 @@ export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries 
               },
             };
           } finally {
-            rmSync(cwd, { recursive: true, force: true });
+            removeWorkDir(cwd);
           }
         }, maxRetries);
       const res = await chatViaActions({ complete, messages, tools, idPrefix: 'cc' });
@@ -101,7 +119,7 @@ export function createClaudeCliProvider({ model, timeoutMs = 180000, maxRetries 
   };
 }
 
-export function createCodexCliProvider({ model, timeoutMs = 240000, maxRetries = 2 } = {}) {
+export function createCodexCliProvider({ model, timeoutMs = 240000, maxRetries = 2, spawn } = {}) {
   const { bin, prefix } = cliCommand('chatgpt');
   return {
     name: 'codex-cli',
@@ -110,13 +128,13 @@ export function createCodexCliProvider({ model, timeoutMs = 240000, maxRetries =
       const header = `${system || ''}\n\n${PROTOCOL_INSTRUCTIONS}\nDo not run shell commands and do not read or write files; the tools in <tools> are the only tools for this task.`.trim();
       const complete = (prompt) =>
         withRetries(async () => {
-          const cwd = mkdtempSync(path.join(os.tmpdir(), 'ig-codex-'));
+          const cwd = makeWorkDir();
           const outFile = path.join(cwd, 'last-message.txt');
           try {
             const args = [...prefix, 'exec', '--skip-git-repo-check', '--sandbox', 'read-only', '--ephemeral', '--ignore-user-config', '--color', 'never', '-C', cwd, '-o', outFile];
             if (model) args.push('-m', model);
             args.push('-');
-            const r = await runProcess(bin, args, { input: `${header}\n\n${prompt}`, timeoutMs, cwd });
+            const r = await runProcess(bin, args, { input: `${header}\n\n${prompt}`, timeoutMs, cwd, spawnImpl: spawn });
             if (r.timedOut) throw cliError(`codex CLI timed out after ${timeoutMs} ms`, true);
             if (r.code !== 0) throw cliError(`codex CLI exited with ${r.code}: ${r.stderr.slice(-300)}`, true);
             let text;
@@ -127,7 +145,7 @@ export function createCodexCliProvider({ model, timeoutMs = 240000, maxRetries =
             }
             return { text, model, usage: {} };
           } finally {
-            rmSync(cwd, { recursive: true, force: true });
+            removeWorkDir(cwd);
           }
         }, maxRetries);
       return chatViaActions({ complete, messages, tools, idPrefix: 'cx' });
